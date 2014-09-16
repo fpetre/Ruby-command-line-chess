@@ -234,7 +234,7 @@ class Pawn < Piece
       new_pos = []
       new_pos << delta[0] + self.pos[0]
       new_pos << delta[1] + self.pos[1]
-      valid_moves << new_pos if can_move_diagonal?(new_pos)
+      valid_moves << new_pos.dup if can_move_diagonal?(new_pos)
     end
 
     valid_moves

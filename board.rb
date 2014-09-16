@@ -18,11 +18,11 @@ class Board
 
     # pawns
     self.board[0].each_index do |index|
-      self[[index,1]] = Pawn.new("black", [index,0], self)
+      self[[index,1]] = Pawn.new("black", [index,1], self)
     end
 
     self.board[1].each_index do |index|
-      self[[index,6]] = Pawn.new("white", [index,1], self)
+      self[[index,6]] = Pawn.new("white", [index,6], self)
     end
 
     # Rooks
@@ -82,6 +82,17 @@ class Board
     end.join("\n")
     puts bstring
     nil
+  end
+
+  def find_all_color_moves(color)
+    all_moves = []
+
+    self.board.each_with_index do |row, y|
+      row.each_with_index do |square, x|
+       all_moves += square.moves if !square.nil? && square.color == color
+      end
+    end
+    all_moves
   end
 
   def find_king(color)
