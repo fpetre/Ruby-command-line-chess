@@ -54,15 +54,14 @@ class SlidingPiece < Piece
       new_pos << delta[0] + self.pos[0]
       new_pos << delta[1] + self.pos[1]
       while can_move?(new_pos)
-        valid_moves << new_pos.dup
-        new_pos[0] = delta[0] + new_pos[0]
-        new_pos[1] = delta[1] + new_pos[1]
-
         if !self.board[new_pos].nil? &&
            self.board[new_pos].color != self.color
           valid_moves << new_pos.dup
           break
         end
+        valid_moves << new_pos.dup
+        new_pos[0] = delta[0] + new_pos[0]
+        new_pos[1] = delta[1] + new_pos[1]
       end
     end
     valid_moves

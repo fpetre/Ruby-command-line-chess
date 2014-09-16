@@ -1,4 +1,8 @@
 require_relative 'piece'
+
+class InvalidMoveException < StandardError
+end
+
 class Board
   SIZE = 8
 
@@ -84,11 +88,27 @@ class Board
     nil
   end
 
+  def move(start, end_pos)
+    if self[start].nil?
+      raise InvalidMoveException #"No piece at that position!"
+    end
+
+    if !self[start].moves.include?(end_pos)
+      raise InvalidMoveException #"Cannot move piece to that position!"
+    end
+
+    piece = self[start]
+    piece.pos = end_pos
+    self[start] = nil
+    self[end_pos] = piece
+
+    nil
+  end
+
   def in_check?(color)
     other_color =  color == "white" ? "black" : "white"
     find_all_color_moves(other_color).include?(find_king(color))
   end
-
 
   def find_all_color_moves(color)
     all_moves = []
