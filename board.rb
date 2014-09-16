@@ -84,4 +84,11 @@ class Board
     nil
   end
 
+  def find_king(color)
+    self.board.each_with_index do |row, y|
+      row.each_with_index do |square, x|
+       return [x,y] if square.is_a?(King) && square.color == color
+      end
+    end
+  end
 end
