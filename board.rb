@@ -75,7 +75,7 @@ class Board
   end
 
   def render
-   bstring = self.board.map do |row|
+    bstring = self.board.map do |row|
       row.map do |square|
         square.nil? ? "_" : square.print_piece
       end.join(" ")
@@ -83,6 +83,12 @@ class Board
     puts bstring
     nil
   end
+
+  def in_check?(color)
+    other_color =  color == "white" ? "black" : "white"
+    find_all_color_moves(other_color).include?(find_king(color))
+  end
+
 
   def find_all_color_moves(color)
     all_moves = []
