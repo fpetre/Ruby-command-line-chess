@@ -21,11 +21,11 @@ class Piece
   end
 
   def down(pos)
-    [pos[0], pos[1] + self.color_factor]
+    [pos[0], pos[1] - self.color_factor]
   end
 
   def up(pos)
-    [pos[0], pos[1] - self.color_factor]
+    [pos[0], pos[1] + self.color_factor]
   end
 
   def moves
@@ -54,7 +54,6 @@ class SlidingPiece < Piece
       new_pos << delta[0] + self.pos[0]
       new_pos << delta[1] + self.pos[1]
       while can_move?(new_pos)
-        p "loop new pos: #{new_pos}"
         valid_moves << new_pos.dup
         new_pos[0] = delta[0] + new_pos[0]
         new_pos[1] = delta[1] + new_pos[1]
@@ -68,7 +67,6 @@ class SlidingPiece < Piece
     end
     valid_moves
   end
-
 end
 
 class Bishop < SlidingPiece
@@ -81,7 +79,6 @@ class Bishop < SlidingPiece
 
     delta_directions
   end
-
 end
 
 class Queen < SlidingPiece
@@ -111,7 +108,6 @@ class Rook < SlidingPiece
 
     delta_directions
   end
-
 end
 
 
@@ -132,7 +128,6 @@ class SteppingPiece < Piece
   def deltas
     raise NotImplementedError
   end
-
 end
 
 
@@ -155,7 +150,6 @@ class King < SteppingPiece
 
     king_delta
   end
-
 end
 
 class Knight < SteppingPiece
@@ -178,8 +172,76 @@ class Knight < SteppingPiece
 
     knight_delta
   end
+end
 
+class Pawn < Piece
 
+  def initialize(color, pos, board)
+    @has_moved = false
+    super
+  end
 
+  def has_moved?
+    @has_moved
+  end
+
+  def moves
+    valid_moves = []
+
+    self.delta_straight.each do |delta|
+      new_pos =[]
+      new_pos << delta[0] + self.pos[0]
+      new_pos << delta[1] + self.pos[1]
+      if can_move_straight?(new_pos)
+        valid_moves << new_pos.dup
+        unless self.has_moved?
+          new_pos[0] += delta[0]
+          new_pos[1] += delta[1]
+          valid_moves << new_pos.dup if can_move_straight?(new_pos)
+        end
+      end
+    end
+
+    self.delta_diagonal.each do |delta|
+      new_pos = []
+      new_pos << delta[0] + self.pos[0]
+      new_pos << delta[1] + self.pos[1]
+      valid_moves << new_pos if can_move_diagonal?(new_pos)
+    end
+
+    valid_moves
+  end
+
+  def can_move_straight?(pos)
+    return false unless pos.all? do |coord|
+      coord.between?(0,(self.board.size-1))
+    end
+
+    self.board[pos].nil?
+  end
+
+  def can_move_diagonal?(pos)
+    return false unless pos.all? do |coord|
+      coord.between?(0,(self.board.size-1))
+    end
+
+    !self.board[pos].nil? && self.board[pos].color != self.color
+  end
+
+  def delta_straight
+    pawn_delta = []
+    pawn_delta << up([0,0])
+    pawn_delta
+  end
+
+  def delta_diagonal
+    pawn_delta = []
+    pawn_delta << up(right([0,0]))
+    pawn_delta << up(left([0,0]))
+    pawn_delta
+  end
 
 end
+
+
+
