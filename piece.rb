@@ -1,3 +1,5 @@
+require_relative 'board'
+
 class Piece
 
   attr_accessor :color, :pos, :board
@@ -7,36 +9,44 @@ class Piece
     @color = color
     @pos = pos
     @board = board
-    @color_factor = self.color == "black" ? -1 : 1
+    @color_factor = self.color == "black" ? 1 : -1
   end
 
   def left(pos)
-    [pos[0] - self.color_factor, pos[1]]
-  end
-
-  def right(pos)
     [pos[0] + self.color_factor, pos[1]]
   end
 
+  def right(pos)
+    [pos[0] - self.color_factor, pos[1]]
+  end
+
   def down(pos)
-    [pos[0], pos[1] - self.color_factor]
+    [pos[0], pos[1] + self.color_factor]
   end
 
   def up(pos)
-    [pos[0], pos[1] + self.color_factor]
+    [pos[0], pos[1] - self.color_factor]
   end
 
   def moves
     valid_moves = []
-    self.deltas.select do |delta|
+    self.deltas.each do |delta|
+      #p delta
       new_pos =[]
       new_pos << delta[0] + self.pos[0]
       new_pos << delta[1] + self.pos[1]
-
-      self.board[new_pos].nil? ||
-      self.board[new_pos].color != self.color ||
-      new_pos.all? { |coord| coord.between?(0,(self.board.size-1)) }
+      valid_moves << new_pos if can_move?(new_pos)
     end
+    valid_moves
+  end
+
+  def can_move?(pos)
+    return false unless pos.all? do |coord|
+      coord.between?(0,(self.board.size-1))
+    end
+
+    self.board[pos].nil? ||
+    self.board[pos].color != self.color
   end
 end
 
@@ -54,6 +64,27 @@ class SteppingPiece < Piece
 
   def deltas
     raise NotImplementedError
+  end
+
+end
+
+class King < SteppingPiece
+  def moves
+    super
+  end
+
+  def deltas
+    king_delta = []
+    king_delta << up([0,0])
+    king_delta << down([0,0])
+    king_delta << left([0,0])
+    king_delta << right([0,0])
+    king_delta << right(up([0,0]))
+    king_delta << left(up([0,0]))
+    king_delta << right(down([0,0]))
+    king_delta << left(down([0,0]))
+
+    king_delta
   end
 
 end
