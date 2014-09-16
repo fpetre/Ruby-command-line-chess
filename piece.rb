@@ -70,6 +70,11 @@ class SlidingPiece < Piece
 end
 
 class Bishop < SlidingPiece
+
+  def print_piece
+    color == "white" ? "♗" : "♝"
+  end
+
   def delta_directions
     delta_directions = []
     delta_directions << right(up([0,0]))
@@ -82,6 +87,11 @@ class Bishop < SlidingPiece
 end
 
 class Queen < SlidingPiece
+
+  def print_piece
+    color == "white" ? "♕" : "♛"
+  end
+
   def delta_directions
     delta_directions = []
     delta_directions << right(up([0,0]))
@@ -99,6 +109,11 @@ class Queen < SlidingPiece
 end
 
 class Rook < SlidingPiece
+
+  def print_piece
+    color == "white" ? "♖" : "♜"
+  end
+
   def delta_directions
     delta_directions = []
     delta_directions << up([0,0])
@@ -137,6 +152,10 @@ class King < SteppingPiece
     super
   end
 
+  def print_piece
+    color == "white" ? "♔" : "♚"
+  end
+
   def deltas
     king_delta = []
     king_delta << up([0,0])
@@ -154,8 +173,13 @@ end
 
 class Knight < SteppingPiece
 
+
   def moves
     super
+  end
+
+  def print_piece
+    self.color == "white" ? "♘" : "♞"
   end
 
   def deltas
@@ -183,6 +207,10 @@ class Pawn < Piece
 
   def has_moved?
     @has_moved
+  end
+
+  def print_piece
+    color == "white" ? "♙" : "♟"
   end
 
   def moves
