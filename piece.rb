@@ -26,39 +26,57 @@ class Piece
     [pos[0], pos[1] + self.color_factor]
   end
 
+  def moves
+    valid_moves = []
+    self.deltas.select do |delta|
+      new_pos =[]
+      new_pos << delta[0] + self.pos[0]
+      new_pos << delta[1] + self.pos[1]
 
-
+      self.board[new_pos].nil? ||
+      self.board[new_pos].color != self.color ||
+      new_pos.all? { |coord| coord.between?(0,(self.board.size-1)) }
+    end
+  end
 end
 
-class SlidingPiece
-
+class SlidingPiece < Piece
+  DIAGONAL_DELTAS = []
+  ORTHOGONAL_DELTAS = []
 end
 
-class SteppingPiece
-
-end
-
-class Knight
-
-
+class SteppingPiece < Piece
 
   def moves
-
+    super
   end
 
-  def all_knight_moves
-    all_knight_moves = []
 
-    all_knight_moves << up(left(left(pos)))
-    all_knight_moves << down(left(left(pos)))
-    all_knight_moves << up(right(right(pos)))
-    all_knight_moves << down(right(right(pos)))
-    all_knight_moves << up(up(left(pos)))
-    all_knight_moves << down(down(left(pos)))
-    all_knight_moves << up(up(right(pos)))
-    all_knight_moves << down(down(right(pos)))
+  def deltas
+    raise NotImplementedError
+  end
 
-    all_knight_moves
+end
+
+class Knight < SteppingPiece
+
+  def moves
+    super
+  end
+
+  def deltas
+    knight_delta = []
+
+    knight_delta << up(left(left([0,0])))
+    knight_delta << down(left(left([0,0])))
+    knight_delta << up(right(right([0,0])))
+    knight_delta << down(right(right([0,0])))
+    knight_delta << up(up(left([0,0])))
+    knight_delta << down(down(left([0,0])))
+    knight_delta << up(up(right([0,0])))
+    knight_delta << down(down(right([0,0])))
+
+    knight_delta
   end
 
 
