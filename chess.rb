@@ -2,6 +2,7 @@
 
 require_relative 'board'
 require 'yaml'
+require 'colorize'
 
 class InvalidEntryException < StandardError
 end
@@ -21,6 +22,7 @@ class Game
 
   def play
     until self.game_over?
+      puts "\e[H\e[2J"
       self.board.render
       print "#{self.current_player[1].to_s}'s turn.  "
       begin
@@ -37,12 +39,14 @@ class Game
         self.current_player[1] = self.current_player[1] == :black ? :white : :black
         self.board[translated_move[1]].has_moved = true
 
-
       rescue InvalidMoveException
         puts "invalid move!"
         retry
       end
     end
+
+    puts "\e[H\e[2J"
+    self.board.render
 
     if self.winner
       puts "Game over. #{self.winner} won!"
@@ -51,7 +55,7 @@ class Game
     end
   end
 
-  protected
+  #protected
 
   def translate_move(moves)
     move_arr = moves.downcase.split(",")
@@ -64,7 +68,7 @@ class Game
 
   def game_over?
     if self.board.checkmate?(self.current_player[1])
-      winner = self.current_player[1].to_s
+      self.winner = self.current_player[1] == :white ? "black" : "white"
       return true
     elsif self.board.stalemate?(self.current_player[1])
       return true
@@ -84,21 +88,14 @@ end
 class HumanPlayer
 
   def play_turn
-
     begin
-
       puts "Please enter move (e.g. f3,f4)"
       move = gets.chomp
-      # while move == "save"
-      #   save_game
-      #   puts "Please enter move (e.g. f3,f4)"
-      #   move = gets.chomp
-      # end
 
       unless move[/^[a-h][1-8][,][a-h][1-8]$/] || move == "save"
         raise InvalidEntryException
       end
-    rescue
+    rescue InvalidEntryException
       puts "invalid move"
       retry
     end

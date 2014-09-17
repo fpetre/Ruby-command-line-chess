@@ -14,6 +14,7 @@ class Piece
   end
 
   def moves
+
   end
 
   def dup(board)
@@ -27,7 +28,7 @@ class Piece
     new_board.in_check?(self.color)
   end
 
-  protected
+  #protected
 
   def left(pos)
     [pos[0] + self.color_factor, pos[1]]
@@ -83,10 +84,10 @@ end
 class Bishop < SlidingPiece
 
   def print_piece
-    color == :white ? "♗" : "♝"
+    color == :white ? " ♗ " : " ♝ "
   end
 
-  protected
+  #protected
 
   def delta_directions
     delta_directions = []
@@ -102,10 +103,10 @@ end
 class Queen < SlidingPiece
 
   def print_piece
-    color == :white ? "♕" : "♛"
+    color == :white ? " ♕ " : " ♛ "
   end
 
-  protected
+  #protected
 
   def delta_directions
     delta_directions = []
@@ -126,10 +127,10 @@ end
 class Rook < SlidingPiece
 
   def print_piece
-    color == :white ? "♖" : "♜"
+    color == :white ? " ♖ " : " ♜ "
   end
 
-  protected
+  #protected
 
   def delta_directions
     delta_directions = []
@@ -166,10 +167,10 @@ class King < SteppingPiece
   end
 
   def print_piece
-    color == :white ? "♔" : "♚"
+    color == :white ? " ♔ " : " ♚ "
   end
 
-  protected
+  #protected
 
   def deltas
     king_delta = []
@@ -193,10 +194,10 @@ class Knight < SteppingPiece
   end
 
   def print_piece
-    self.color == :white ? "♘" : "♞"
+    self.color == :white ? " ♘ " : " ♞ "
   end
 
-  protected
+  #protected
 
   def deltas
     knight_delta = []
@@ -217,7 +218,7 @@ end
 class Pawn < Piece
 
   def print_piece
-    color == :white ? "♙" : "♟"
+    color == :white ? " ♙ " : " ♟ "
   end
 
   def moves
@@ -244,7 +245,7 @@ class Pawn < Piece
     valid_moves
   end
 
-  protected
+  #protected
 
   def can_move_straight?(pos)
     return false unless pos.all? do |coord|

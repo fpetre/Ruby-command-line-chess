@@ -35,16 +35,24 @@ class Board
   end
 
   def render
-    puts "  " + ('a'..'h').to_a.join(" ")
+    puts "   " + ('a'..'h').to_a.join("  ")
     bstring = self.board.map.with_index do |row, row_num|
       "#{row_num + 1} " +
-      row.map do |square|
-        square.nil? ? "_" : square.print_piece
-      end.join(" ") +
+      row.map.with_index do |square,column_num|
+        if square.nil?
+           (column_num + row_num) % 2 == 0 ? "   ".colorize(:background =>:white ) : "   "
+        else
+           if (column_num + row_num) % 2 == 0
+              square.print_piece.colorize(:background => :white)
+           else
+              square.print_piece
+           end
+        end
+      end.join("") +
       " #{row_num + 1}"
     end.join("\n")
     puts bstring
-    puts "  " + ('a'..'h').to_a.join(" ")
+    puts "   " + ('a'..'h').to_a.join("  ")
     nil
   end
 
@@ -66,10 +74,7 @@ class Board
       raise InvalidMoveException
     end
 
-    piece = self[start]
-    piece.pos = end_pos
-    self[start] = nil
-    self[end_pos] = piece
+    move!(start, end_pos)
 
     nil
   end
@@ -109,7 +114,7 @@ class Board
     new_board
   end
 
-  protected
+  #protected
 
   def set_up_board
     # pawns
@@ -153,41 +158,26 @@ class Board
     self[[4,7]] = King.new(:white, [4,7], self)
   end
 
+  def get_all_pieces
+    self.board.flatten.compact
+  end
+
   def cannot_avoid_check?(color)
-    self.board.all? do |row|
-      row.all? do |square|
-        if square.nil?
-          true
-        else
-          square.moves.all? do |move|
-            if square.color != color
-              true
-            else
-              square.move_into_check?(move)
-            end
-          end
-        end
-      end
+    same_color_pieces = self.get_all_pieces.select {|piece| piece.color == color}
+
+    same_color_pieces.all? do |piece|
+      piece.moves.all? {|move| piece.move_into_check?(move)}
     end
   end
 
   def find_all_color_moves(color)
-    all_moves = []
-
-    self.board.each_with_index do |row, y|
-      row.each_with_index do |square, x|
-       all_moves += square.moves if !square.nil? && square.color == color
-      end
-    end
-    all_moves
+    same_color_pieces = self.get_all_pieces.select {|piece| piece.color == color}
+    same_color_pieces.map(&:moves).flatten(1)
   end
 
   def find_king(color)
-    self.board.each_with_index do |row, y|
-      row.each_with_index do |square, x|
-       return [x,y] if square.is_a?(King) && square.color == color
-      end
-    end
+    same_color_pieces = self.get_all_pieces.select {|piece| piece.color == color}
+    same_color_pieces.select { |piece| piece.is_a?(King) }.first.pos
   end
 
 end
