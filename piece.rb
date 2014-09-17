@@ -3,7 +3,7 @@ require_relative 'board'
 class Piece
 
   attr_accessor :color, :pos, :board, :has_moved
-  attr_reader :color_factor   # => make this private??
+  attr_reader :color_factor   # => make this protected??
 
   def initialize(color, pos, board)
     @color = color
@@ -12,6 +12,22 @@ class Piece
     @color_factor = self.color == :black ? 1 : -1
     @has_moved = false
   end
+
+  def moves
+  end
+
+  def dup(board)
+    new_piece = self.class.new(self.color, self.pos.dup, board)
+    new_piece
+  end
+
+  def move_into_check?(target)
+    new_board = self.board.dup
+    new_board.move!(self.pos, target)
+    new_board.in_check?(self.color)
+  end
+
+  protected
 
   def left(pos)
     [pos[0] + self.color_factor, pos[1]]
@@ -29,9 +45,6 @@ class Piece
     [pos[0], pos[1] + self.color_factor]
   end
 
-  def moves
-  end
-
   def can_move?(pos)
     return false unless pos.all? do |coord|
       coord.between?(0,(self.board.size-1))
@@ -40,24 +53,10 @@ class Piece
     self.board[pos].nil? ||
     self.board[pos].color != self.color
   end
-
-  def dup(board)
-    new_piece = self.class.new(self.color, self.pos.dup, board)
-    new_piece
-  end
-
-  def move_into_check?(target)
-    new_board = self.board.dup
-    new_board.move!(self.pos, target)
-    new_board.in_check?(self.color)
-  end
-
 end
 
 
 class SlidingPiece < Piece
-  # DIAGONAL_DELTAS = []
-  # ORTHOGONAL_DELTAS =[]
 
   def moves
     valid_moves = []
@@ -87,6 +86,8 @@ class Bishop < SlidingPiece
     color == :white ? "♗" : "♝"
   end
 
+  protected
+
   def delta_directions
     delta_directions = []
     delta_directions << right(up([0,0]))
@@ -103,6 +104,8 @@ class Queen < SlidingPiece
   def print_piece
     color == :white ? "♕" : "♛"
   end
+
+  protected
 
   def delta_directions
     delta_directions = []
@@ -125,6 +128,8 @@ class Rook < SlidingPiece
   def print_piece
     color == :white ? "♖" : "♜"
   end
+
+  protected
 
   def delta_directions
     delta_directions = []
@@ -151,9 +156,6 @@ class SteppingPiece < Piece
     valid_moves
   end
 
-  def deltas
-    raise NotImplementedError
-  end
 end
 
 
@@ -166,6 +168,8 @@ class King < SteppingPiece
   def print_piece
     color == :white ? "♔" : "♚"
   end
+
+  protected
 
   def deltas
     king_delta = []
@@ -184,7 +188,6 @@ end
 
 class Knight < SteppingPiece
 
-
   def moves
     super
   end
@@ -192,6 +195,8 @@ class Knight < SteppingPiece
   def print_piece
     self.color == :white ? "♘" : "♞"
   end
+
+  protected
 
   def deltas
     knight_delta = []
@@ -211,10 +216,6 @@ end
 
 class Pawn < Piece
 
-  def has_moved?
-    @has_moved
-  end
-
   def print_piece
     color == :white ? "♙" : "♟"
   end
@@ -227,7 +228,7 @@ class Pawn < Piece
 
       if can_move_straight?(new_pos)
         valid_moves << new_pos.dup
-        unless self.has_moved?
+        unless self.has_moved
           new_pos[0] += delta[0]
           new_pos[1] += delta[1]
           valid_moves << new_pos.dup if can_move_straight?(new_pos)
@@ -242,6 +243,8 @@ class Pawn < Piece
 
     valid_moves
   end
+
+  protected
 
   def can_move_straight?(pos)
     return false unless pos.all? do |coord|

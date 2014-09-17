@@ -1,4 +1,7 @@
+#!/usr/bin/env ruby
+
 require_relative 'board'
+require 'yaml'
 
 class InvalidEntryException < StandardError
 end
@@ -21,16 +24,20 @@ class Game
       self.board.render
       print "#{self.current_player[1].to_s}'s turn.  "
       begin
-        move = translate_move(self.current_player[0].play_turn)
-        p move
+        move = self.current_player[0].play_turn
 
-        if wrong_color?(self.current_player[1], move[0])
-          raise InvalidMoveException
+        if move == "save"
+          self.save_game
+          redo
         end
 
-        self.board.move(move[0], move[1])
+        translated_move = translate_move(move)
+
+        self.board.move(self.current_player[1], translated_move[0], translated_move[1])
         self.current_player[1] = self.current_player[1] == :black ? :white : :black
-        self.board[move[1]].has_moved = true
+        self.board[translated_move[1]].has_moved = true
+
+
       rescue InvalidMoveException
         puts "invalid move!"
         retry
@@ -44,9 +51,7 @@ class Game
     end
   end
 
-  def wrong_color?(color, pos)
-    color != self.board[pos].color
-  end
+  protected
 
   def translate_move(moves)
     move_arr = moves.downcase.split(",")
@@ -68,6 +73,11 @@ class Game
     false
   end
 
+  def save_game
+    puts "please enter file name"
+    file_name = gets.chomp
+    File.write(file_name, YAML.dump(self))
+  end
 end
 
 
@@ -76,9 +86,16 @@ class HumanPlayer
   def play_turn
 
     begin
+
       puts "Please enter move (e.g. f3,f4)"
       move = gets.chomp
-      unless move[/^[a-h][1-8][,][a-h][1-8]$/]
+      # while move == "save"
+      #   save_game
+      #   puts "Please enter move (e.g. f3,f4)"
+      #   move = gets.chomp
+      # end
+
+      unless move[/^[a-h][1-8][,][a-h][1-8]$/] || move == "save"
         raise InvalidEntryException
       end
     rescue
@@ -89,4 +106,19 @@ class HumanPlayer
     move
   end
 
+end
+
+
+if __FILE__ == $PROGRAM_NAME
+
+  case ARGV.count
+  when 0
+    h1 = HumanPlayer.new
+    h2 = HumanPlayer.new
+    g = Game.new(h1,h2)
+  when 1
+    g = YAML.load_file(ARGV.shift)
+  end
+
+  g.play
 end
