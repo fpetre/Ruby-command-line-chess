@@ -127,6 +127,34 @@ class Board
     find_all_color_moves(other_color).include?(find_king(color))
   end
 
+  def cannot_avoid_check?(color)
+    self.board.all? do |row|
+      row.all? do |square|
+        if square.nil?
+          true
+        else
+          square.moves.all? do |move|
+            if square.color != color
+              true
+            else
+              square.move_into_check?(move)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def checkmate?(color)
+    return false unless self.in_check?(color)
+    cannot_avoid_check?(color)
+  end
+
+  def stalemate?(color)
+    return false if self.in_check?(color)
+    cannot_avoid_check?(color)
+  end
+
   def find_all_color_moves(color)
     all_moves = []
 
@@ -151,7 +179,6 @@ class Board
 
     self.board.each_with_index do |row, y|
       row.each_with_index do |square, x|
-        p square.class
         new_board[[x,y]] = square.nil? ? nil : square.dup(new_board)
       end
     end

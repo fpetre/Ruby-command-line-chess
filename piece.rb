@@ -2,7 +2,7 @@ require_relative 'board'
 
 class Piece
 
-  attr_accessor :color, :pos, :board
+  attr_accessor :color, :pos, :board, :has_moved
   attr_reader :color_factor   # => make this private??
 
   def initialize(color, pos, board)
@@ -10,6 +10,7 @@ class Piece
     @pos = pos
     @board = board
     @color_factor = self.color == :black ? 1 : -1
+    @has_moved = false
   end
 
   def left(pos)
@@ -209,11 +210,6 @@ class Knight < SteppingPiece
 end
 
 class Pawn < Piece
-
-  def initialize(color, pos, board)
-    @has_moved = false
-    super
-  end
 
   def has_moved?
     @has_moved
