@@ -101,6 +101,10 @@ class Board
       raise InvalidMoveException #"Cannot move piece to that position!"
     end
 
+    if self[start].move_into_check?(end_pos)
+      raise InvalidMoveException
+    end
+
     piece = self[start]
     piece.pos = end_pos
     self[start] = nil
