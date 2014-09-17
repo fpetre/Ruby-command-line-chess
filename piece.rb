@@ -9,7 +9,7 @@ class Piece
     @color = color
     @pos = pos
     @board = board
-    @color_factor = self.color == "black" ? 1 : -1
+    @color_factor = self.color == :black ? 1 : -1
   end
 
   def left(pos)
@@ -50,15 +50,15 @@ class SlidingPiece < Piece
     valid_moves = []
 
     self.delta_directions.each do |delta|
-      new_pos =[]
-      new_pos << delta[0] + self.pos[0]
-      new_pos << delta[1] + self.pos[1]
+      new_pos = [delta[0] + self.pos[0], delta[1] + self.pos[1]]
+
       while can_move?(new_pos)
-        if !self.board[new_pos].nil? &&
+        if self.board[new_pos] &&
            self.board[new_pos].color != self.color
           valid_moves << new_pos.dup
           break
         end
+
         valid_moves << new_pos.dup
         new_pos[0] = delta[0] + new_pos[0]
         new_pos[1] = delta[1] + new_pos[1]
@@ -71,7 +71,7 @@ end
 class Bishop < SlidingPiece
 
   def print_piece
-    color == "white" ? "♗" : "♝"
+    color == :white ? "♗" : "♝"
   end
 
   def delta_directions
@@ -88,7 +88,7 @@ end
 class Queen < SlidingPiece
 
   def print_piece
-    color == "white" ? "♕" : "♛"
+    color == :white ? "♕" : "♛"
   end
 
   def delta_directions
@@ -110,7 +110,7 @@ end
 class Rook < SlidingPiece
 
   def print_piece
-    color == "white" ? "♖" : "♜"
+    color == :white ? "♖" : "♜"
   end
 
   def delta_directions
@@ -131,11 +131,10 @@ class SteppingPiece < Piece
   def moves
     valid_moves = []
     self.deltas.each do |delta|
-      new_pos =[]
-      new_pos << delta[0] + self.pos[0]
-      new_pos << delta[1] + self.pos[1]
+      new_pos = [delta[0] + self.pos[0], delta[1] + self.pos[1]]
       valid_moves << new_pos if can_move?(new_pos)
     end
+
     valid_moves
   end
 
@@ -152,7 +151,7 @@ class King < SteppingPiece
   end
 
   def print_piece
-    color == "white" ? "♔" : "♚"
+    color == :white ? "♔" : "♚"
   end
 
   def deltas
@@ -178,7 +177,7 @@ class Knight < SteppingPiece
   end
 
   def print_piece
-    self.color == "white" ? "♘" : "♞"
+    self.color == :white ? "♘" : "♞"
   end
 
   def deltas
@@ -209,16 +208,15 @@ class Pawn < Piece
   end
 
   def print_piece
-    color == "white" ? "♙" : "♟"
+    color == :white ? "♙" : "♟"
   end
 
   def moves
     valid_moves = []
 
     self.delta_straight.each do |delta|
-      new_pos =[]
-      new_pos << delta[0] + self.pos[0]
-      new_pos << delta[1] + self.pos[1]
+      new_pos = [delta[0] + self.pos[0], delta[1] + self.pos[1]]
+
       if can_move_straight?(new_pos)
         valid_moves << new_pos.dup
         unless self.has_moved?
@@ -230,9 +228,7 @@ class Pawn < Piece
     end
 
     self.delta_diagonal.each do |delta|
-      new_pos = []
-      new_pos << delta[0] + self.pos[0]
-      new_pos << delta[1] + self.pos[1]
+      new_pos = [delta[0] + self.pos[0], delta[1] + self.pos[1]]
       valid_moves << new_pos.dup if can_move_diagonal?(new_pos)
     end
 
