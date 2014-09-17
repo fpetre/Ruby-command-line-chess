@@ -39,6 +39,18 @@ class Piece
     self.board[pos].nil? ||
     self.board[pos].color != self.color
   end
+
+  def dup(board)
+    new_piece = self.class.new(self.color, self.pos.dup, board)
+    new_piece
+  end
+
+  def move_into_check?(target)
+    new_board = self.board.dup
+    new_board.move(self.pos, target)
+    new_board.in_check?(self.color)
+  end
+
 end
 
 

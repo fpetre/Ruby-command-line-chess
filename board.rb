@@ -79,12 +79,16 @@ class Board
   end
 
   def render
-    bstring = self.board.map do |row|
+    puts "  " + ('a'..'h').to_a.join(" ")
+    bstring = self.board.map.with_index do |row, row_num|
+      "#{row_num + 1} " +
       row.map do |square|
         square.nil? ? "_" : square.print_piece
-      end.join(" ")
+      end.join(" ") +
+      " #{row_num + 1}"
     end.join("\n")
     puts bstring
+    puts "  " + ('a'..'h').to_a.join(" ")
     nil
   end
 
@@ -97,6 +101,15 @@ class Board
       raise InvalidMoveException #"Cannot move piece to that position!"
     end
 
+    piece = self[start]
+    piece.pos = end_pos
+    self[start] = nil
+    self[end_pos] = piece
+
+    nil
+  end
+
+  def move!(start, end_pos)
     piece = self[start]
     piece.pos = end_pos
     self[start] = nil
@@ -128,4 +141,18 @@ class Board
       end
     end
   end
+
+  def dup
+    new_board = Board.new
+
+    self.board.each_with_index do |row, y|
+      row.each_with_index do |square, x|
+        p square.class
+        new_board[[x,y]] = square.nil? ? nil : square.dup(new_board)
+      end
+    end
+    new_board
+  end
+
 end
+
