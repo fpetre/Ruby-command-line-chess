@@ -2,7 +2,7 @@ require_relative 'board'
 
 class Piece
 
-  attr_accessor :color, :pos, :board, :has_moved
+  attr_accessor :color, :pos, :board
   attr_reader :color_factor   # => make this protected??
 
   def initialize(color, pos, board)
@@ -10,7 +10,6 @@ class Piece
     @pos = pos
     @board = board
     @color_factor = self.color == :black ? 1 : -1
-    @has_moved = false
   end
 
   def moves
@@ -229,7 +228,7 @@ class Pawn < Piece
 
       if can_move_straight?(new_pos)
         valid_moves << new_pos.dup
-        unless self.has_moved
+        unless self.has_moved?
           new_pos[0] += delta[0]
           new_pos[1] += delta[1]
           valid_moves << new_pos.dup if can_move_straight?(new_pos)
@@ -246,6 +245,10 @@ class Pawn < Piece
   end
 
   #protected
+
+  def has_moved?
+    self.color == :black ? self.pos[1] != 1 : self.pos[1] != 6
+  end
 
   def can_move_straight?(pos)
     return false unless pos.all? do |coord|

@@ -37,7 +37,6 @@ class Game
 
         self.board.move(self.current_player[1], translated_move[0], translated_move[1])
         self.current_player[1] = self.current_player[1] == :black ? :white : :black
-        self.board[translated_move[1]].has_moved = true
 
       rescue InvalidMoveException
         puts "invalid move!"
