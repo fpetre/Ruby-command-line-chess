@@ -93,6 +93,9 @@ class Board
   end
 
   def move(start, end_pos)
+    p start
+    p end_pos
+
     if self[start].nil?
       raise InvalidMoveException #"No piece at that position!"
     end
